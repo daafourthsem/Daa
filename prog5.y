@@ -1,9 +1,13 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+
+int yyerror();
+int yylex();
+
 %}
 %token ID NUM FOR LE GE EQ NE OR AND
-%right "="
+%right '='
 %left AND OR
 %left '>' '<' LE GE EQ NE
 %left '+' '-'
@@ -62,12 +66,12 @@ E2     : E'<'E
          ;   
 %%
 
-int yyerror() {
+int yyerror(const char *s) {
 	printf("Wrong!\n");
 	return 1;
 }
 
-#include "lex.yy.c"
-main() {
+int main() {
     yyparse();
+    return 0;
 }
