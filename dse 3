@@ -1,0 +1,101 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn import metrics
+%matplotlib inline
+In [ ]:
+df=pd.read_csv("P3_Weather.csv",low_memory=False)
+In [ ]:
+df.head()
+In [ ]:
+df.shape
+In [ ]:
+df.describe()
+In [ ]:
+df.plot(x='MinTemp', y='MaxTemp', style='.')
+plt.title('MinTemp vs MaxTemp')
+plt.xlabel('MinTemp')
+plt.ylabel('MaxTemp')
+plt.show()
+In [ ]:
+plt.figure(figsize=(15,10))
+sns.distplot(df['MaxTemp'])
+In [ ]:
+X = df['MinTemp'].values.reshape(-1,1)
+y = df['MaxTemp'].values.reshape(-1,1)
+# X=df.iloc[:,5].values
+In [ ]:
+X
+In [ ]:
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+In [ ]:
+regressor = LinearRegression()
+regressor.fit(X_train, y_train) #training the algorithm
+In [ ]:
+li=[]
+for i in range(101):
+    li.append(regressor.predict([[i]])[0][0])
+print(li)
+In [ ]:
+#To retrieve the intercept:
+print(regressor.intercept_)#For retrieving the slope:
+print(regressor.coef_)
+In [ ]:
+y_pred = regressor.predict(X_test)
+
+df1 = pd.DataFrame({'Actual': y_test.flatten(), 'Predicted': y_pred.flatten()})
+df1
+In [ ]:
+df2 = df1.head(25)
+df2.plot(kind='bar',figsize=(16,10))
+plt.grid(which='major', linestyle='-', linewidth='0.5', color='green')
+plt.grid(which='minor', linestyle=':', linewidth='10.5', color='black')
+plt.show()
+In [ ]:
+plt.scatter(X_test, y_test,  color='gray')
+plt.plot(X_test, y_pred, color='red', linewidth=2)
+plt.show()
+In [ ]:
+print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+In [ ]:
+#Multiple Regression
+In [ ]:
+df.dtypes
+In [ ]:
+df.isnull().any()
+In [ ]:
+df = df.fillna(method='ffill')
+In [ ]:
+df.isnull().any()
+In [ ]:
+X_m = df[['MeanTemp', 'MinTemp']].values
+y_m = df['MaxTemp'].values
+In [ ]:
+Xm_train, Xm_test, ym_train, ym_test = train_test_split(X_m, y_m, test_size=0.2, random_state=0)
+In [ ]:
+regressor = LinearRegression()
+regressor.fit(Xm_train, ym_train)
+In [ ]:
+coeff_df = pd.DataFrame(regressor.coef_, ['MinTemp', 'MeanTemp'], columns=['Coefficient'])
+coeff_df
+In [ ]:
+ym_pred = regressor.predict(Xm_test)
+In [ ]:
+dfm = pd.DataFrame({'Actual': ym_test, 'Predicted': ym_pred})
+dfm1 = dfm.head(25)
+In [ ]:
+dfm1
+In [ ]:
+print('Mean Absolute Error:', metrics.mean_absolute_error(ym_test, ym_pred))
+print('Mean Squared Error:', metrics.mean_squared_error(ym_test, ym_pred))
+print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(ym_test, ym_pred)))
+In [ ]:
+dfm1.plot(kind='bar',figsize=(10,8))
+plt.grid(which='major', linestyle='-', linewidth='0.5', color='green')
+plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+plt.show()
