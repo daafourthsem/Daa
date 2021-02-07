@@ -1,0 +1,49 @@
+import pandas as pd
+import numpy as numpy
+import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+from sklearn.tree import export_graphviz
+from sklearn.externals.six import StringIO
+from IPython.display import Image
+import pydotplus
+import seaborn as sns
+In [ ]:
+df = pd.read_csv("P5_diabetes.csv")
+df.head()
+In [ ]:
+df.info()
+In [ ]:
+feature_cols = ['Pregnancies','Glucose','BloodPressure' ,'SkinThickness','Insulin' ,'BMI','DiabetesPedigreeFunction','Age']
+In [ ]:
+corr = df.corr()
+corr
+In [ ]:
+sns.heatmap(corr,annot=True)
+plt.show()
+In [ ]:
+df.describe()
+In [ ]:
+df.shape
+In [ ]:
+X = df.iloc[:,:-1].values
+In [ ]:
+y = df.iloc[:,-1].values
+In [ ]:
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size = 0.2, random_state = 1)
+In [ ]:
+clf = DecisionTreeClassifier(criterion = 'entropy', max_depth = 4)
+clf = clf.fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+In [ ]:
+print("Accuracy:",metrics.accuracy_score(y_test,y_pred))
+In [ ]:
+dot_data = StringIO()
+export_graphviz(clf, out_file=dot_data,
+                filled=True, rounded=True,
+                special_characters=True,feature_names = feature_cols,class_names=['0','1'])
+graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+graph.write_png('diabetes.png')
+Image(graph.create_png())
+ 
