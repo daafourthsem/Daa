@@ -1,0 +1,71 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt1
+import seaborn as sns
+import string
+import nltk
+from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.metrics import classification_report,confusion_matrix,accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import SVC, NuSVC, LinearSVC
+%matplotlib inline
+In [ ]:
+df = pd.read_csv('P6_P7_spam.csv',encoding = 'latin-1')
+In [ ]:
+df.shape
+In [ ]:
+df.info()
+df=df.dropna(axis=1)
+In [ ]:
+df.columns = ['label','message']
+df = df[['message','label']]
+In [ ]:
+df['length']=df['message'].apply(len)
+df.head()
+In [ ]:
+df['length'].plot(bins=50,kind='hist')
+In [ ]:
+df.length.describe()
+In [ ]:
+def text_process(mess):
+    nopunc =[char for char in mess if char not in string.punctuation]
+    nopunc=''.join(nopunc)
+    return [word for word in nopunc.split() if word.lower() not in stopwords.words('english')]
+In [ ]:
+#nltk.download('stopwords')
+df['message'].head(5).apply(text_process)
+In [ ]:
+msg_train,msg_test,label_train,label_test = train_test_split(df['message'],df['label'],test_size=0.2)
+
+#bow_transformer = CountVectorizer(analyzer=text_process).fit(df['message'])
+bow_transformer = CountVectorizer(analyzer=text_process).fit(msg_train)
+print(bow_transformer.vocabulary_)
+In [ ]:
+messages_bow = bow_transformer.transform(msg_train)
+In [ ]:
+tfidf_transformer = TfidfTransformer(use_idf = False)
+messages_tfidf=tfidf_transformer.transform(messages_bow)
+print(messages_tfidf.shape)
+In [ ]:
+messages_bow1 = bow_transformer.transform(msg_test)
+tfidf_transformer = TfidfTransformer(use_idf = False)
+messages_tfidf1=tfidf_transformer.transform(messages_bow1)
+In [ ]:
+model1 = LinearSVC()
+model1.fit(messages_tfidf,label_train)
+result1 = model1.predict(messages_tfidf1)
+print(classification_report(label_test,result1))
+print(confusion_matrix(label_test,result1))
+accuracy_score(label_test,result1)
+In [ ]:
+model2 = SVC()
+model2.fit(messages_tfidf,label_train)
+result2 = model2.predict(messages_tfidf1)
+print(classification_report(label_test,result2))
+print(confusion_matrix(label_test,result2))
+accuracy_score(label_test,result2)
+
+ 
