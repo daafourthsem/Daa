@@ -1,0 +1,31 @@
+import pandas as pd
+df = pd.read_csv("P1_movies_metadata.csv",low_memory=False)
+In [ ]:
+df.head()
+In [ ]:
+df.describe()
+In [ ]:
+df.info()
+In [ ]:
+import seaborn as sns
+import matplotlib.pyplot as plt
+In [ ]:
+corr = df.corr(method='pearson')
+corr
+In [ ]:
+sns.heatmap(corr,annot=True)
+plt.show()
+In [ ]:
+df['budget'] = pd.to_numeric(df['budget'],errors='coerce')
+df['profit'] = df['revenue'] - df['budget']
+df['profit']
+In [ ]:
+df.head()
+In [ ]:
+corr2 = df.corr(method='pearson')
+corr2
+In [ ]:
+sns.heatmap(corr2,annot=True)
+plt.show()
+
+ 
