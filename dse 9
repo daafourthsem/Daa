@@ -1,0 +1,125 @@
+import pandas as pd
+import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import MinMaxScaler
+import seaborn as sns
+import matplotlib.pyplot as plt
+%matplotlib inline
+In [ ]:
+train_url = "http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/train.csv"
+train = pd.read_csv(train_url)
+test_url = "http://s3.amazonaws.com/assets.datacamp.com/course/Kaggle/test.csv"
+test = pd.read_csv(test_url)
+In [ ]:
+#Train Set
+train.head()
+In [ ]:
+#Test data
+test.head()
+In [ ]:
+#Train description
+train.describe()
+In [ ]:
+#Test description
+test.describe()
+In [ ]:
+print(train.columns.values)
+In [ ]:
+# For the train set
+train.isna().head()
+In [ ]:
+# For the test set
+test.isna().head()
+In [ ]:
+#In the train set
+train.isna().sum()
+In [ ]:
+#In the test set
+test.isna().sum()
+In [ ]:
+# Fill missing values with mean column values in the train set
+train.fillna(train.mean(), inplace=True)
+In [ ]:
+# Fill missing values with mean column values in the test set
+test.fillna(test.mean(), inplace=True)
+In [ ]:
+train.isna().sum()
+In [ ]:
+train['Ticket'].head()
+In [ ]:
+train['Cabin'].head()
+In [ ]:
+train.groupby(['Pclass'], as_index=False)['Survived'].mean().sort_values(by='Survived', ascending=False)
+In [ ]:
+train.groupby(['Sex'], as_index=False)['Survived'].mean().sort_values(by='Survived', ascending=False)
+In [ ]:
+train.groupby(['SibSp'], as_index=False)['Survived'].mean().sort_values(by='Survived', ascending=False)
+In [ ]:
+train.groupby(['Parch'], as_index=False)['Survived'].mean().sort_values(by='Survived', ascending=False)
+In [ ]:
+g = sns.FacetGrid(train, col='Survived')
+g.map(plt.hist, 'Age', bins=20)
+In [ ]:
+grid = sns.FacetGrid(train, col='Survived', row='Pclass', height=2.2, aspect=1.6)
+grid.map(plt.hist, 'Age', alpha=.5, bins=20)
+grid.add_legend();
+In [ ]:
+train.info()
+In [ ]:
+train = train.drop(['Name','Ticket', 'Cabin','Embarked'], axis=1)
+test = test.drop(['Name','Ticket', 'Cabin','Embarked'], axis=1)
+In [ ]:
+labelEncoder = LabelEncoder()
+labelEncoder.fit(train['Sex'])
+labelEncoder.fit(test['Sex'])
+train['Sex'] = labelEncoder.transform(train['Sex'])
+test['Sex'] = labelEncoder.transform(test['Sex'])
+In [ ]:
+test.info()
+In [ ]:
+X = np.array(train.drop(['Survived'], 1).astype(float))
+In [ ]:
+y = np.array(train['Survived'])
+In [ ]:
+kmeans = KMeans(n_clusters=2) # You want cluster the passenger records into 2: Survived or Not survived
+kmeans.fit(X)
+In [ ]:
+correct = 0
+for i in range(len(X)):
+    predict_me = np.array(X[i].astype(float))
+    predict_me = predict_me.reshape(-1, len(predict_me))
+    prediction = kmeans.predict(predict_me)
+    if prediction[0] == y[i]:
+        correct += 1
+
+print(correct/len(X))
+In [ ]:
+kmeans = kmeans = KMeans(n_clusters=2, max_iter=600, algorithm = 'auto')
+kmeans.fit(X)
+In [ ]:
+correct = 0
+for i in range(len(X)):
+    predict_me = np.array(X[i].astype(float))
+    predict_me = predict_me.reshape(-1, len(predict_me))
+    prediction = kmeans.predict(predict_me)
+    if prediction[0] == y[i]:
+        correct += 1
+
+print(correct/len(X))
+In [ ]:
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+In [ ]:
+kmeans.fit(X_scaled)
+In [ ]:
+correct = 0
+for i in range(len(X)):
+    predict_me = np.array(X[i].astype(float))
+    predict_me = predict_me.reshape(-1, len(predict_me))
+    prediction = kmeans.predict(predict_me)
+    if prediction[0] == y[i]:
+        correct += 1
+
+print(correct/len(X))
+
